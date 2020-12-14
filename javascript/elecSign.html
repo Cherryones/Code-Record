@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas绘制电子签名</title>
+    <style>
+        #canvas {
+            width: 300px;
+            height: 300px;
+            border: 1px solid #000000;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas width="1200" height="1200" id="canvas"></canvas>
+    <script>
+        const multiple = 4 // 放大倍数；绘制的图片比较粗糙/不够清晰时，通常通过将画布尺寸调大来提高分辨率
+
+        // 绘制签名
+        function handleWrite(ctx, beginX, beginY, stopX, stopY) {
+            ctx.beginPath() 
+            ctx.lineWidth = 2 * 4 // 默认1
+            // ctx.strokeStyle = 'red' // 默认黑色
+            ctx.moveTo(beginX * multiple, beginY * multiple)
+            ctx.lineTo(stopX * multiple, stopY * multiple)
+            ctx.closePath()
+            ctx.stroke()
+        }
+        // document.readyState 
+        // loading(加载中)/interactive(可交互的)/complete(完成)
+        window.onload = function() {
+            const canvas = document.getElementById('canvas')
+            const ctx = canvas.getContext('2d')
+            const offsetLeft = canvas.offsetLeft // 画布距离视口y轴的距离
+            const offsetTop = canvas.offsetTop // 画布距离视口x轴的距离
+            let beginX
+            let beginY
+            let stopX
+            let stopY
+            // 注入监听事件
+            canvas.addEventListener('touchstart', e => {
+                e.preventDefault() // 阻止在canvas画布上签名的时候页面跟着滚动
+                // clientX：触摸目标在视口中的x坐标。
+                // clientY：触摸目标在视口中的y坐标。
+                // identifier：标识触摸的唯一ID。
+                // pageX：触摸目标在页面中的x坐标。
+                // pageY：触摸目标在页面中的y坐标。
+                // screenX：触摸目标在屏幕中的x坐标。
+                // screenY：触摸目标在屏幕中的y坐标。
+                // target：触摸的DOM节点目标。
+                beginX = e.touches[0].clientX - offsetLeft
+                beginY = e.touches[0].clientY - offsetTop
+            })
+            canvas.addEventListener('touchmove', e => {
+                e.preventDefault() // 阻止在canvas画布上签名的时候页面跟着滚动
+                stopX = e.touches[0].clientX - offsetLeft
+                stopY = e.touches[0].clientY - offsetTop
+                // 绘制
+                handleWrite(ctx, beginX, beginY, stopX, stopY)
+                // 重置起点
+                beginX = stopX
+                beginY = stopY
+            })
+        }
+    </script>
+</body>
+</html>
