@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .parent {
+            width: 500px;
+            height: 500px;
+            border: solid 1px #000000;
+        }
+        .child {
+            width: 200px;
+            height: 200px;
+            margin: 20px;
+            border: solid 1px #000000;
+            pointer-events: none; /** 使鼠标的target事件对该元素无效，相当于穿透 */
+        }
+    </style>
+</head>
+<!-- 场景测试 -->
+<!-- 来源：一个技术群的提问——获取在父元素div里面的鼠标位置，但是里面有子元素，就会变成子元素的event事件
+方案：
+1) 阻止冒泡——同学甲脱口而出
+分析：怀疑这个同学没有仔细审题，冒泡——由内向外传递，阻止冒泡，只是阻止事件向外传递，跟这个场景看似相似但其实没啥关系
+
+2) 使用pointer-events：none使子元素穿透——同学乙灵机一动（本人）
+分析： MDN解释：pointer-events CSS 属性指定在什么情况下 (如果有) 某个特定的图形元素可以成为鼠标事件的 target。
+      给子元素设置pointer-events: none会使得子元素永远不会成为鼠标事件的target
+      相当于落在子元素的鼠标事件会自然穿透到父元素上，对这个问题的解决是有很高适配性的。
+      但同时，这个方案也有一个致命缺点：永远不能在子元素上再加上任何事件。
+
+3) 使用修饰符.capture事件捕获模式（vue项目）——同学丙查阅资料
+分析：
+同学丙的查阅资料——即元素自身触发的事件先在此处处理，然后才交由内部元素进行处理
+看了他发的查阅截图，依旧感觉很迷惑的我，在本地做了一次试验。发现，并不能解决当前这个问题。
+仔细斟酌这句话，其本意不就是调整事件的冒泡顺序吗？原本按照由内向外执行的原则，会优先执行使用了事件捕获模式的事件，再执行自身元素事件。
+同时我也在群里@了这位同学，得到他的再次实践发现确实是个无效方案。
+
+.capture的详解： https://www.cnblogs.com/xiaozhang666/p/10430059.html
+修饰符写的挺全面的一篇文：https://www.cnblogs.com/gitByLegend/p/10835064.html
+ -->
+分析：
+
+<body>
+    <div class="parent" onmousemove="handleMove(event)">
+        parent
+        <div class="child">
+            child
+        </div>
+    </div>
+    <script>
+        // 获取事件e
+        // 方法1：html行内方法传入event即可获取事件e，前提是参数名必须是event
+        // 方法2：使用 window.event （适用于ie和google）以及 arguments.callee.caller.arguments[0]（适用于火狐和google）
+        function handleMove(e) { // 
+            // const e = arguments.callee.caller.arguments[0] || window.event
+            console.log(e.target)
+        }
+    </script>
+</body>
+</html>
