@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script> -->
+</head>
+<body>
+    <div id="app">
+        <h3>姓名：</h3>
+        <p>{{ name }}</p>
+        <h3>年龄：</h3>
+        <p>{{ age }}</p>
+    </div>
+    <script>
+        // PS：忘记了就再打一遍断点~
+
+        // DOMContentLoaded
+        // 当初始的 HTML 文档被完全加载和解析完成之后，DOMContentLoaded 事件被触发，而无需等待样式表、图像和子框架的完成加载。
+        // load
+        // load 仅用于检测一个完全加载的页面，页面的html、css、js、图片等资源都已经加载完之后才会触发 load 事件。
+        document.addEventListener('DOMContentLoaded', function() {
+            let opt = {
+                el: '#app',
+                data: {
+                    name: '检索中...',
+                    age: 25
+                }
+            }
+            new Vue(opt)
+            setTimeout(() => {
+                opt.data.name = 'xiongying'
+            }, 1000)
+        }, false) // useCapture 指定事件是否在捕获或冒泡阶段执行，默认false+
+
+        // 构建一个简单的Vue
+        class Vue {
+            constructor(opt) {
+                this.opt = opt
+                this.observe(opt.data) // 观察器
+                
+                let root = document.querySelector(opt.el)
+                this.compile(root) // 编译模板
+            }
+            observe(data) {
+                // 为响应式对象data里的每一个key绑定一个观察者对象
+                // 和只为data绑定一个观察者对象的区别
+                Object.keys(data).forEach(key => {
+                    let obv = new Observer() 
+                    data['_' + key] = data[key] // ~~
+                    // MDN: Object.defineProperty() 方法会直接在一个对象上定义一个新属性，或者修改一个对象的现有属性，并返回此对象。
+                    Object.defineProperty(data, key, {
+                        get() {
+                            console.log(Observer.target) // Observer 是类的地址，当做一个公共可达的地址，换成别的也行，无关紧要
+                            Observer.target && obv.addSubNode(Observer.target)
+                            return data['_' + key] // 直接return data[key]会导致栈溢出，用中间变量替代
+                        },
+                        set(newVal) {
+                            obv.update(newVal)
+                            data['_' + key] = newVal
+                        }
+                    })
+                    
+                })
+            }
+            compile(node) {
+                // node.childNodes是一个伪数组
+                [].forEach.call(node.childNodes, child => {
+                    if (!child.firstElementChild && /\{\{(.*)\}\}/.test(child.innerHTML)) {
+                        let key = RegExp.$1.trim()
+                        console.log(this.opt)
+
+                        child.innerHTML = child.innerHTML.replace(new RegExp('\\{\\{\\s*'+ key +'\\s*\\}\\}', 'gm'), this.opt.data[key]) // 触发getter
+                        Observer.target = child
+
+                        this.opt.data[key] // 触发getter函数，根据Observer.target把需要的响应节点存储起来，因此下一步需要置为null
+                        Observer.target = null
+                    } else if (child.firstElementChild) {
+                        this.compile(child)
+                    }
+                })
+            }
+        }
+        class Observer {
+            constructor() {
+                this.subNode = []
+            }
+            addSubNode(node) {
+                this.subNode.push(node)
+            }
+            update(newVal) {
+                this.subNode.forEach(node => {
+                    node.innerHTML = newVal
+                })
+            }
+        }
+    </script>
+</body>
+</html>
