@@ -65,8 +65,13 @@
                 })
             }
             compile(node) {
-                // node.childNodes是一个伪数组
-                [].forEach.call(node.childNodes, child => {
+                // node.childNodes是一个类数组
+                // 类数组的种类：
+                // a. NodeList：document.querySelectorAll() 返回的对象；
+                // b. HTMLCollection：document.getElementsByTagName() 返回的对象；
+                // c. Arguments：函数里的参数对象；
+                // [].forEach.call(node.childNodes, child => {
+                [...node.childNodes].map(child => { // 使用拓展运算符把类数组转为数组
                     if (!child.firstElementChild && /\{\{(.*)\}\}/.test(child.innerHTML)) {
                         let key = RegExp.$1.trim()
                         console.log(this.opt)
