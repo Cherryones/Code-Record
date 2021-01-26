@@ -44,3 +44,20 @@ try {
 // 解析：+的优先级比条件运算符的优先级高
 var val = 'smtg';
 console.log('Value is ' + (val === 'smtg') ? 'Something' : 'Nothing');
+
+
+// 一个生成判断数据类型的方法的函数
+// es5写法
+// function isType(type) {
+//     return function(target) {
+//         return Object.prototype.toString.call(target) === '[object ' + type + ']'
+//     }
+// }
+
+// es6写法
+const isType = type => target => Object.prototype.toString.call(target) === `[object ${type}]`
+
+const isArray = isType('Array')
+console.log(isArray([]))
+const isFunction = isType('Function')
+console.log(isFunction(() => {}))
