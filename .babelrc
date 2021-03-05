@@ -1,5 +1,5 @@
+// 最佳实践？
 {
-    // "plugins": ["@babel/plugin-transform-arrow-functions"],
     "presets": [
         [
             "@babel/preset-env",
@@ -12,10 +12,6 @@
     "plugins": [
         [
             "@babel/plugin-transform-runtime"
-        ],
-        [
-            "@babel/plugin-transform-modules-amd"
-            // "@babel/plugin-transform-modules-commonjs"
         ]
     ]
 }

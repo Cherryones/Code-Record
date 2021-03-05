@@ -4,7 +4,6 @@
  * @Description: Babel学习
  */
 
-const { async } = require("regenerator-runtime");
 
 // "compiler": "babel src --out-dir lib --watch" —— 将src目录下的文件编译后输出到lib文件夹
 
