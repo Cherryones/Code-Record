@@ -1,0 +1,69 @@
+<!--
+ * @Author: xiongying
+ * @Date: 2021-03-17 10:42:32
+ * @Description: 插槽
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+</head>
+<body>
+  <div id="root">
+    <my-component>
+      <!-- <template v-slot:test="slotProps" >
+        我的名是{{slotProps.user.firstName}}
+        我的姓是{{slotProps.user.lastName}}
+      </template> -->
+
+      <!-- v-slot 的值实际上可以是任何能够作为函数定义中的参数的 JavaScript 表达式。所以在支持的环境下 (单文件组件或现代浏览器)，也可以使用 ES2015 解构来传入具体的插槽 prop -->
+
+      <!-- 等价于 -->
+      <!-- 解构模式 -->
+      <!-- <template v-slot:test="{ user }" > 
+        我的名是{{ user.firstName }}
+        我的姓是{{ user.lastName }}
+      </template> -->
+      <!-- prop重命名 -->
+      <!-- <template v-slot:test="{ user: abc }" > 
+        我的名是{{ abc.firstName }}
+        我的姓是{{ abc.lastName }}
+      </template> -->
+      <!-- 定义后备内容 -->
+      <template #test="{ user = { firstName: 'cai', lastName: 'congcong' } }" > 
+        我的名是{{ user.firstName }}
+        我的姓是{{ user.lastName }}
+      </template>
+    </my-component>
+  </div>
+</body>
+<script>
+  Vue.component('my-component', {
+    data: function() {
+      return {
+        // user: {
+        //   firstName: 'ying',
+        //   lastName: 'xiong'
+        // }
+        user: undefined
+      }
+    },
+    template: `
+      <div>
+        <h2>我们得接受失望</h2>
+        <slot name="test" v-bind:user="user"></slot>
+      </div>
+    `
+  })
+  new Vue({
+    el: '#root',
+    data: {
+      text: '什么鬼东西'
+    }
+  })
+</script>
+</html>
